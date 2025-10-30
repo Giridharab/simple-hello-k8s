@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "localhost:5000/hello-app"
+        DOCKERHUB_USER = credentials('dockerhub-credentials')  // Jenkins Credential ID
+        IMAGE_NAME = "docker.io/${DOCKERHUB_USER_USR}/hello-app"
     }
 
     stages {
@@ -12,13 +13,19 @@ pipeline {
             }
         }
 
+        stage('Docker Login') {
+            steps {
+                sh 'echo $DOCKERHUB_USER_PSW | docker login -u $DOCKERHUB_USER_USR --password-stdin'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:latest app/'
             }
         }
 
-        stage('Push to Local Registry') {
+        stage('Push to Docker Hub') {
             steps {
                 sh 'docker push $IMAGE_NAME:latest'
             }
@@ -27,6 +34,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                  sed -i "s|image:.*|image: $IMAGE_NAME:latest|g" app/deployment.yaml
                   kubectl apply -f app/deployment.yaml
                   kubectl rollout status deployment/hello-app
                 '''
@@ -36,7 +44,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Application deployed successfully!"
+            echo "✅ Application deployed successfully from Docker Hub!"
             sh "kubectl get svc hello-app-service -o wide"
         }
     }

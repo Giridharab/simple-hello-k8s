@@ -18,16 +18,21 @@ pipeline {
             }
         }
 
-        stage('Push Image to DockerHub'){
-			steps {
-				script {
-					docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_HUB_USER}"){
-						dockerImage.push('latest')
-					}
-				}
-			}
-		}
-
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'DOCKER_HUB_CREDENTIALS',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push $IMAGE_NAME:latest
+                    """
+                }
+            }
+        }
+		
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''

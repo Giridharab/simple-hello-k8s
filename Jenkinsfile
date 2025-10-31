@@ -18,11 +18,15 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
-            steps {
-                sh 'docker push $IMAGE_NAME:latest'
-            }
-        }
+        stage('Push Image to DockerHub'){
+			steps {
+				script {
+					docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_HUB_USER}"){
+						dockerImage.push('latest')
+					}
+				}
+			}
+		}
 
         stage('Deploy to Kubernetes') {
             steps {

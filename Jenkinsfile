@@ -13,12 +13,6 @@ pipeline {
             }
         }
 
-        stage('Docker Login') {
-            steps {
-                sh 'echo $DOCKERHUB_USER | docker login -u $DOCKERHUB_USER --password-stdin'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:latest app/'

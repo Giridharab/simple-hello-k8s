@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKERHUB_USER = credentials('dockerhub-credentials')  // Jenkins Credential ID
-        IMAGE_NAME = "docker.io/${DOCKERHUB_USER}/hello-app"
-    }
-
     stages {
         stage('Checkout') {
             steps {

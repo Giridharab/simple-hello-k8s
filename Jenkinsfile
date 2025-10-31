@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+     environment {
+        IMAGE_NAME = "giridharab/hello-app"   // ✅ set your Docker Hub repo name
+    }
+
     stages {
         stage('Checkout') {
             steps {

@@ -2,7 +2,7 @@ pipeline {
     agent any
 
      environment {
-        IMAGE_NAME = "giridharab/hello-app"   // ✅ set your Docker Hub repo name
+        IMAGE_NAME = "giridmur7/hello-app"  // ✅ set your Docker Hub repo name
     }
 
     stages {
